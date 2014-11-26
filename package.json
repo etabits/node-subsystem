@@ -1,6 +1,6 @@
 {
   "name": "subsystem",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Node subsystems provider (User Forms for now)",
   "main": "index.js",
   "scripts": {
