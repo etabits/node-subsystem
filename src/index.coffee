@@ -49,23 +49,30 @@ class UserForms
 
 		@fields = _.merge {}, defaults.fields, @opts.fields
 
-		@pathSettingsDefaults = _.merge {}, defaults.pathSettings, {tpl: @opts.defaultTemplate}
+		@pathSettingsDefaults = _.merge {}, defaults.pathSettings #, {tpl: @opts.defaultTemplate}
 		for path, pathSettings of @opts.paths
+			pathSettings.path = path
 			pathSettings = _.merge {}, @pathSettingsDefaults, pathSettings
 			pathSettings.formFields = {}
 			pathSettings.formFields[fieldName] = @fields[fieldName] for fieldName in pathSettings.fields
 
+			# User or Visitor?
+			pathSettings.loggedIn = -1 == ['register','reset'].indexOf(pathSettings.type)
 			# Correct middlewares
-			pathSettings.middlewares.push switch pathSettings.type
-				when 'register' then helpers.mw.notLoggedIn
-				else helpers.mw.loggedIn
+			pathSettings.middlewares.push if pathSettings.loggedIn then helpers.mw.loggedIn else helpers.mw.notLoggedIn
+			pathSettings.tpl ?= if pathSettings.loggedIn then @opts.defaultUserTemplate else @opts.defaultVisitorTemplate
 
 			switch pathSettings.type
 				when 'password'
 					pathSettings.formFields = {
 						old_password: @fields['old_password']
-						password: @fields['password']
+						password:  @fields['password']
 						password2: @fields['password2']
+					}
+				when 'email'
+					pathSettings.formFields = {
+						email:  @fields['email']
+						email2: @fields['email2']
 					}
 					
 			pathSettings.form = forms.create pathSettings.formFields, @opts.formCreateOptions
@@ -87,6 +94,7 @@ class UserForms
 			tpl: pathSettings.tpl
 			locals: {
 				title: 'Account'
+				userFormsPathSettings: pathSettings
 			}
 		}
 		switch pathSettings.type
@@ -96,6 +104,7 @@ class UserForms
 					autoResponderSettings.successMessage = 'Your account was updated successfully.'
 
 					helpers.autoFormRespond req, res, autoResponderSettings
+
 			when 'register'
 				(req, res, next)->
 					autoResponderSettings.successCb = (form)->
@@ -107,10 +116,28 @@ class UserForms
 						#console.log 
 					helpers.autoFormRespond req, res, autoResponderSettings
 
-			when 'password'
+			when 'email'
 				(req, res, next)->
 					autoResponderSettings.successCb = (form)->
 						console.log form.data
+						req.user.email = form.data['email']
+						req.user.emailVerified = false
+						req.user.save (err)->
+							if err
+								return next(err)
+							else
+								req.flash 'messages', {
+									type: 'success'
+									body: 'Your email was changed successfully!'
+								}
+							res.redirect ''
+
+					helpers.autoFormRespond req, res, autoResponderSettings
+
+			when 'password'
+				(req, res, next)->
+					autoResponderSettings.successCb = (form)->
+						#console.log form.data
 						req.user.changePassword form.data['old_password'], form.data['password'], (err)->
 							if err
 								if 'subsystem' == err.source # our error

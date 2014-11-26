@@ -8,10 +8,13 @@ What will it do?
 
 Given a User model, it will
 * Create registration form (handle post/get with user supplied template that includes form tpl)
-* Send verification email (if emailVerified field is there)
 
 Also, will provide the following forms:
-* Password reset
+* Profile update (multiple forms)
 * Password change
-* Profile update
 * ...
+
+TODO
+* Change Email
+* Password reset
+* Send verification email (if emailVerified field is there)
