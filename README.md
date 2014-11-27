@@ -13,8 +13,8 @@ Also, will provide the following forms:
 * Profile update (multiple forms)
 * Password change
 * ...
+* Change Email
 
 TODO
-* Change Email
 * Password reset
 * Send verification email (if emailVerified field is there)
