@@ -7,7 +7,7 @@ class Mandrill
 	constructor: (@opts) ->
 		self = this
 		@client = new mandrill.Mandrill(@opts.apiKey)
-		console.log 'apiKey:', @opts.apiKey
+		#console.log 'apiKey:', @opts.apiKey
 
 	send: (template, metas, vars, done)->
 		global_merge_vars = []

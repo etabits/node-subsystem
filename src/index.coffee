@@ -6,4 +6,5 @@ subsystem = module.exports = {
 		Mandrill: require('./mailer/mandrill')
 	}
 	helpers: require('./helpers')
+	ResetKeyring: require('./reset_keyring/')
 }
