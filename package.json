@@ -6,6 +6,10 @@
   "scripts": {
     "prepublish": "./node_modules/.bin/coffee --output lib --compile src"
   },
+  "files": [
+    "index.js",
+    "lib"
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/etabits/node-subsystem.git"
