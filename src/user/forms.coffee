@@ -142,6 +142,7 @@ class UserForms extends EventEmitter
             console.log form.data
             #req.user.email = ''
             req.user.unverifiedEmail = form.data['email']
+            self.sendVerificationEmail(req.user)
             req.user.save (err)->
               if err
                 return next(err)
