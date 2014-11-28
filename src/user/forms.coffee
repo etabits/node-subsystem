@@ -102,11 +102,7 @@ class UserForms extends EventEmitter
 
     if self.opts.emailActivationTemplate
       #console.log self.opts.emailActivationTemplate
-      self.on 'registration', (user)->
-        user.unverifiedEmail = user.email
-        user.email = ''
-        user.save ()->
-          self.sendVerificationEmail(user)
+      self.on 'registration', (user)-> self.sendVerificationEmail(user)
 
 
   createResponder: (pathSettings)->
@@ -130,6 +126,8 @@ class UserForms extends EventEmitter
         (req, res, next)->
           autoResponderSettings.successCb = (form)->
             u = new self.User(form.data)
+            u.unverifiedEmail = u.email
+            u.email = ''
             u.save (err)->
               return next(err) if err
               self.emit 'registration', u
@@ -142,15 +140,15 @@ class UserForms extends EventEmitter
         (req, res, next)->
           autoResponderSettings.successCb = (form)->
             console.log form.data
-            req.user.email = form.data['email']
-            req.user.emailVerified = false
+            #req.user.email = ''
+            req.user.unverifiedEmail = form.data['email']
             req.user.save (err)->
               if err
                 return next(err)
               else
                 req.flash 'messages', {
                   type: 'success'
-                  body: 'Your email was changed successfully!'
+                  body: 'Your email was changed successfully. Your new email is unverified until you click the link sent to your new email address. Meanwhile, you will continue to receive emails to your old address.'
                 }
               res.redirect ''
 
