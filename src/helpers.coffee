@@ -33,6 +33,25 @@ helpers.doUserSchema = (userSchema, opts)->
 				next()
 
 
+helpers.createDbFieldValidator = (model, fieldName, shouldExist, errorMessage)->
+	shouldExist ?= false
+	#shouldExist ?= true
+	errorMessage ?= if shouldExist then "No such #{fieldName} in our database" else "#{fieldName} already present in the database"
+	(fform, field, cb)->
+		#console.log fform
+		fieldValue = field.data
+		query = {}
+		query[fieldName] = fieldValue
+
+		model.findOne query, (err, doc) ->
+			#console.log doc, shouldExist
+			error = !doc == shouldExist
+			field._foundDocument = doc
+			if error
+				cb(errorMessage)
+			else
+				cb()
+
 helpers.autoFormRespond = (req, res, opts)->
 	res.locals.messages = req.flash('messages')
 	theForm = opts.form

@@ -3,6 +3,7 @@ forms = require 'forms'
 fields = forms.fields
 validators = forms.validators
 async = require 'async'
+mongoose = require 'mongoose'
 
 helpers = require '../helpers'
 {EventEmitter} = require 'events'
@@ -15,8 +16,10 @@ defaults = {
   }
   opts: {
     formCreateOptions: {validatePastFirstError: true}
+    emailTemplates: {}
   }
   fields: {
+    #reset_email: 
 
     email2:  fields.email({
       required: validators.required('Please confirm your email')
@@ -74,6 +77,11 @@ class UserForms extends EventEmitter
             email:  @fields['email']
             email2: @fields['email2']
           }
+        when 'reset'
+          pathSettings.formFields = {
+            email:  fields.email({ required: true, validators: [helpers.createDbFieldValidator(mongoose.model('User'), 'email', true)]})
+          }
+
           
       pathSettings.form = forms.create pathSettings.formFields, @opts.formCreateOptions
 
@@ -83,7 +91,7 @@ class UserForms extends EventEmitter
 
   sendVerificationEmail: (user, done)->
     self.opts.resetKeyring.createKey 'verify', {email: user.email, user: user._id}, (err, verificationKey)->
-      self.opts.mailer.send self.opts.emailActivationTemplate, {
+      self.opts.mailer.send self.opts.emailTemplates['activation'], {
           to: [user.name, user.email]
         }, {
           FIRSTNAME: user.name.split(' ')[0]
@@ -100,8 +108,8 @@ class UserForms extends EventEmitter
       app.post path, pathSettings.middlewares, pathSettings.responder
 
 
-    if self.opts.emailActivationTemplate
-      #console.log self.opts.emailActivationTemplate
+    if self.opts.emailTemplates['activation']
+      #console.log self.opts.emailTemplates['activation']
       self.on 'registration', (user)-> self.sendVerificationEmail(user)
 
 
@@ -134,6 +142,23 @@ class UserForms extends EventEmitter
               return self.opts.registrationHandler(req, res, next, u, form)
 
             #console.log
+          helpers.autoFormRespond req, res, autoResponderSettings
+
+      when 'reset'
+        (req, res, next)->
+          autoResponderSettings.successCb = (form)->
+            self.User.findOne {email: form.data.email}, (err, user)->
+              self.opts.resetKeyring.createKey 'reset', {email: user.email, user: user._id}, (err, resetKey)->
+                self.opts.mailer.send self.opts.emailTemplates['reset'], {
+                    to: [user.name, user.email]
+                  }, {
+                    FIRSTNAME: user.name.split(' ')[0]
+                    URLPREFIX: self.opts.resetKeyring.types['reset']
+                    RESET_KEY: resetKey.key
+                  }, ()->
+                    req.flash 'messages', {type: 'success', body: 'Reset Email sent. Please check your inbox.'}
+                    res.redirect '/'
+
           helpers.autoFormRespond req, res, autoResponderSettings
 
       when 'email'
