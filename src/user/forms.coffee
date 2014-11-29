@@ -82,9 +82,9 @@ class UserForms extends EventEmitter
       @opts.paths[path] = pathSettings
 
   sendVerificationEmail: (user, done)->
-    self.opts.resetKeyring.createKey 'verify', {email: user.unverifiedEmail, user: user._id}, (err, verificationKey)->
+    self.opts.resetKeyring.createKey 'verify', {email: user.email, user: user._id}, (err, verificationKey)->
       self.opts.mailer.send self.opts.emailActivationTemplate, {
-          to: [user.name, user.unverifiedEmail]
+          to: [user.name, user.email]
         }, {
           FIRSTNAME: user.name.split(' ')[0]
           URLPREFIX: self.opts.resetKeyring.types['verify']
@@ -126,8 +126,8 @@ class UserForms extends EventEmitter
         (req, res, next)->
           autoResponderSettings.successCb = (form)->
             u = new self.User(form.data)
-            u.unverifiedEmail = u.email
-            u.email = ''
+            #u.unverifiedEmail = u.email
+            #u.email = ''
             u.save (err)->
               return next(err) if err
               self.emit 'registration', u
@@ -141,15 +141,16 @@ class UserForms extends EventEmitter
           autoResponderSettings.successCb = (form)->
             console.log form.data
             #req.user.email = ''
-            req.user.unverifiedEmail = form.data['email']
-            self.sendVerificationEmail(req.user)
+            req.user.email = form.data['email']
+            req.user.emailVerified = false
             req.user.save (err)->
               if err
                 return next(err)
               else
+                self.sendVerificationEmail(req.user)
                 req.flash 'messages', {
                   type: 'success'
-                  body: 'Your email was changed successfully. Your new email is unverified until you click the link sent to your new email address. Meanwhile, you will continue to receive emails to your old address.'
+                  body: 'Your email was changed successfully. Your new email is unverified until you click the link sent to your new email address. Please start to use the new address to login.'
                 }
               res.redirect ''
 

@@ -21,11 +21,11 @@ class ResetKeyring extends EventEmitter
 				next()
 
 		self.on 'request-verify', (req, res, next)->
-			mongoose.model('User').findOne {_id: req.resetKey.meta.user, unverifiedEmail: req.resetKey.meta.email}, (err, user)->
+			mongoose.model('User').findOne {_id: req.resetKey.meta.user, email: req.resetKey.meta.email}, (err, user)->
 				return next(err) if err
 				return res.send(404) if not user
-				user.email = user.unverifiedEmail
-				user.unverifiedEmail = ''
+				#user.email = user.unverifiedEmail
+				user.emailVerified = true
 				user.save()
 				req.resetKey.remove()
 				req.flash('messages', {type: 'success', body: 'Email Verified'})
