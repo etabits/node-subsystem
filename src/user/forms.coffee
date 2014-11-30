@@ -23,6 +23,12 @@ defaults = {
 
     email2:  fields.email({
       required: validators.required('Please confirm your email')
+      validators: [validators.matchField('email')]
+      label: 'Confirm Email'
+
+    })
+    email2_change:  fields.email({
+      required: validators.required('Please confirm your email')
       validators: [validators.matchField('new_email')]
       label: 'Confirm Email'
 
@@ -75,7 +81,7 @@ class UserForms extends EventEmitter
         when 'email'
           pathSettings.formFields = {
             new_email:  @fields['email']
-            email2: @fields['email2']
+            email2: @fields['email2_change']
           }
         when 'reset'
           pathSettings.formFields = {
