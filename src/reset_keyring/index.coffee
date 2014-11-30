@@ -28,7 +28,7 @@ class ResetKeyring extends EventEmitter
         user.emailVerified = true
         user.save()
         req.resetKey.remove()
-        req.flash('messages', {type: 'success', body: 'Email Verified'})
+        req.flash('messages', {type: 'success', body: 'Thank you, your email has now been verified.'})
         res.redirect '/'
 
     self.on 'request-reset', (req, res, next)->
@@ -48,7 +48,7 @@ class ResetKeyring extends EventEmitter
               NEW_PASSWORD: newPassword
             }, ()->
               req.flash('messages', {type: 'success', body: 'New password sent to your email inbox.'})
-              res.redirect '/'
+              res.redirect '/account/'
               #console.log(req.resetKey, user, newPassword); return;
               #req.resetKey.remove()
 

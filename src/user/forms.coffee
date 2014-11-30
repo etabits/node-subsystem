@@ -23,7 +23,7 @@ defaults = {
 
     email2:  fields.email({
       required: validators.required('Please confirm your email')
-      validators: [validators.matchField('email')]
+      validators: [validators.matchField('new_email')]
       label: 'Confirm Email'
 
     })
@@ -74,7 +74,7 @@ class UserForms extends EventEmitter
           }
         when 'email'
           pathSettings.formFields = {
-            email:  @fields['email']
+            new_email:  @fields['email']
             email2: @fields['email2']
           }
         when 'reset'
@@ -166,7 +166,7 @@ class UserForms extends EventEmitter
           autoResponderSettings.successCb = (form)->
             console.log form.data
             #req.user.email = ''
-            req.user.email = form.data['email']
+            req.user.email = form.data['new_email']
             req.user.emailVerified = false
             req.user.save (err)->
               if err
@@ -177,7 +177,7 @@ class UserForms extends EventEmitter
                   type: 'success'
                   body: 'Your email was changed successfully. Your new email is unverified until you click the link sent to your new email address. Please start to use the new address to login.'
                 }
-              res.redirect ''
+              res.redirect req.originalUrl
 
           helpers.autoFormRespond req, res, autoResponderSettings
 
@@ -201,7 +201,7 @@ class UserForms extends EventEmitter
                   body: 'Your password was changed successfully!'
                 }
                 self.emit 'passwordchange', req.user
-              res.redirect ''
+              res.redirect req.originalUrl
 
 
 
