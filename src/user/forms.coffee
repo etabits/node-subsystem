@@ -85,11 +85,16 @@ class UserForms extends EventEmitter
           }
         when 'reset'
           pathSettings.formFields = {
-            email:  fields.email({ required: true, validators: [helpers.createDbFieldValidator(mongoose.model('User'), 'email', true)]})
+            email:  fields.email({ required: true, validators: [helpers.createDbFieldValidator(self.User, 'email', true)]})
           }
 
-          
-      pathSettings.form = forms.create pathSettings.formFields, @opts.formCreateOptions
+      
+      try 
+        pathSettings.form = forms.create pathSettings.formFields, @opts.formCreateOptions
+      catch e
+        console.log pathSettings.formFields
+        throw e
+
 
       pathSettings.responder = self.createResponder(pathSettings)
 
