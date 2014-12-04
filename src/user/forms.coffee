@@ -162,7 +162,7 @@ class UserForms extends EventEmitter
                     URLPREFIX: self.opts.resetKeyring.types['reset']
                     RESET_KEY: resetKey.key
                   }, ()->
-                    req.flash 'messages', {type: 'success', body: 'Reset Email sent. Please check your inbox.'}
+                    req.flash 'messages', {type: 'success', body: 'An email to reset your password has been sent to you.'}
                     res.redirect '/'
 
           helpers.autoFormRespond req, res, autoResponderSettings

@@ -29,7 +29,7 @@ class ResetKeyring extends EventEmitter
         user.save()
         req.resetKey.remove()
         req.flash('messages', {type: 'success', body: 'Thank you, your email has now been verified.'})
-        res.redirect '/'
+        res.redirect '/account/'
 
     self.on 'request-reset', (req, res, next)->
       mongoose.model('User').findOne {_id: req.resetKey.meta.user, email: req.resetKey.meta.email}, (err, user)->
