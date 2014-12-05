@@ -47,7 +47,7 @@ class ResetKeyring extends EventEmitter
               FIRSTNAME: user.name.split(' ')[0]
               NEW_PASSWORD: newPassword
             }, ()->
-              req.flash('messages', {type: 'success', body: 'New password sent to your email inbox.'})
+              req.flash('messages', {type: 'success', body: 'A new password was sent to your email.'})
               res.redirect '/account/'
               #console.log(req.resetKey, user, newPassword); return;
               #req.resetKey.remove()
