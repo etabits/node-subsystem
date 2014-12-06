@@ -168,7 +168,7 @@ class UserForms extends EventEmitter
                     RESET_KEY: resetKey.key
                   }, ()->
                     req.flash 'messages', {type: 'success', body: 'An email to reset your password has been sent to you.'}
-                    res.redirect '/'
+                    res.redirect req.originalUrl
 
           helpers.autoFormRespond req, res, autoResponderSettings
 
