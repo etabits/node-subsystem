@@ -100,9 +100,9 @@ class UserForms extends EventEmitter
 
       @opts.paths[path] = pathSettings
 
-  sendVerificationEmail: (user, done)->
+  sendVerificationEmail: (user, template='activacion')->
     self.opts.resetKeyring.createKey 'verify', {email: user.email, user: user._id}, (err, verificationKey)->
-      self.opts.mailer.send self.opts.emailTemplates['activation'], {
+      self.opts.mailer.send self.opts.emailTemplates[template], {
           to: [user.name, user.email]
         }, {
           FIRSTNAME: user.name.split(' ')[0]
@@ -121,7 +121,7 @@ class UserForms extends EventEmitter
 
     if self.opts.emailTemplates['activation']
       #console.log self.opts.emailTemplates['activation']
-      self.on 'registration', (user)-> self.sendVerificationEmail(user)
+      self.on 'registration', (user)-> self.sendVerificationEmail(user, 'welcome')
 
 
   createResponder: (pathSettings)->
