@@ -125,13 +125,14 @@ class UserForms extends EventEmitter
 
 
   createResponder: (pathSettings)->
+
     autoResponderSettings = {
       form: pathSettings.form
       tpl: pathSettings.tpl
-      locals: {
+      locals: _.assign({
         title: 'Account'
         userFormsPathSettings: pathSettings
-      }
+      }, pathSettings.locals)
     }
     switch pathSettings.type
       when 'update'
